@@ -55,10 +55,10 @@ def main():
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS metadata (
                         dataset_name TEXT,
-                        num_rows INTEGER,
-                        num_columns INTEGER,
+                        n_rows INTEGER,
+                        n_columns INTEGER,
                         size INTEGER,
-                        class_label TEXT
+                        target_column TEXT
                     )
                 """)
                 

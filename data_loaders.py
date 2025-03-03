@@ -12,10 +12,9 @@ class SQLiteDataset(Dataset):
         # Read metadata
         with sqlite3.connect(db_path) as conn:
             metadata_df = pd.read_sql(
-                f"SELECT * FROM metadata WHERE table_name = '{table_name}'", 
+                f"SELECT * FROM metadata WHERE dataset_name = '{table_name}'", 
                 conn
             )
-            # Store metadata information
             self.n_rows = metadata_df['n_rows'].iloc[0]
             self.n_columns = metadata_df['n_columns'].iloc[0]
             self.target_column = metadata_df['target_column'].iloc[0]
