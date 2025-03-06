@@ -3,7 +3,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import Adam
 import numpy as np
-from data_loaders import create_train_val_test_loaders
+from data_loaders import create_train_val_loaders
 
 class SimpleModel(nn.Module):
     def __init__(self, input_size):
@@ -34,8 +34,8 @@ def train_and_evaluate_model(db_path, table_name, epochs=10, val_size=0.15, test
         Trained model and performance metrics
     """
     # Create data loaders with train/val/test split
-    train_loader, val_loader, test_loader = create_train_val_test_loaders(
-        db_path, table_name, val_size=val_size, test_size=test_size, batch_size=32
+    train_loader, val_loader = create_train_val_loaders(
+        db_path, table_name, val_size=val_size, batch_size=32
     )
     
     # Get input size from first batch
@@ -110,32 +110,10 @@ def train_and_evaluate_model(db_path, table_name, epochs=10, val_size=0.15, test
     # Load best model for final evaluation
     if best_model_state:
         model.load_state_dict(best_model_state)
+     
     
-    # Final evaluation on test set
-    model.eval()
-    test_loss = 0
-    test_acc = 0
-    test_batches = 0
     
-    with torch.no_grad():
-        for features, targets in test_loader:
-            outputs = model(features)
-            loss = criterion(outputs, targets.float().unsqueeze(1))
-            test_loss += loss.item()
-            
-            # Calculate accuracy
-            predictions = (outputs >= 0.5).float()
-            correct = (predictions == targets.float().unsqueeze(1)).sum().item()
-            test_acc += correct / len(targets)
-            test_batches += 1
-    
-    avg_test_loss = test_loss / test_batches
-    avg_test_acc = test_acc / test_batches
-    
-    print("\nFinal Test Results:")
-    print(f"  Test Loss: {avg_test_loss:.4f}, Test Accuracy: {avg_test_acc:.4f}")
-    
-    return model, {'test_loss': avg_test_loss, 'test_accuracy': avg_test_acc}
+    return model, 
 
 # For backward compatibility
 def test_training(db_path, table_name, epochs=10):
@@ -148,6 +126,5 @@ if __name__ == "__main__":
     DB_PATH = "medinet.db"
     TABLE_NAME = "heart_failure_clinical_records_dataset"
 
-    trained_model, metrics = train_and_evaluate_model(DB_PATH, TABLE_NAME)
+    trained_model = train_and_evaluate_model(DB_PATH, TABLE_NAME)
     print("Training completed successfully!")
-    print(f"Test accuracy: {metrics['test_accuracy']:.4f}")
